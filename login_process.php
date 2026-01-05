@@ -17,18 +17,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             
-            // ✅ admin যেন user panel-এ login না করতে পারে
+            //
             if ($role !== 'admin') {
-                session_regenerate_id(true); // নতুন সেশন আইডি তৈরি করুন
+                session_regenerate_id(true); // 
 
                 $_SESSION['user_id'] = $id;
                 $_SESSION['user_name'] = $name;
-                $_SESSION['user_role'] = $role; // ব্যবহারকারীর আসল রোল সেশনে সেট করা হচ্ছে
+                $_SESSION['user_role'] = $role; 
 
-                header("Location: index.php");
-                exit();
+               // 
+header("Location: index.php?login=success");
+exit();
             } else {
-                // যদি কেউ admin role নিয়ে এখানে ঢুকতে চায়
+                // 
                 header("Location: login.php?error=" . urlencode("Admins must login from admin panel."));
                 exit();
             }

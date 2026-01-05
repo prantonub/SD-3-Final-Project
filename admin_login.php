@@ -2,7 +2,7 @@
 session_start();
 include 'includes/db.php';
 
-// ✅ এখানে admin session চেক করা উচিত user_role দিয়ে নয়
+// Redirect if already logged in as admin
 if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'admin') {
     header("Location: admin/index.php");
     exit();
@@ -25,9 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             if ($role === 'admin') {
-                session_regenerate_id(true); // নতুন সেশন আইডি তৈরি করুন
-
-                // ✅ আলাদা session variable ব্যবহার করা হচ্ছে admin এর জন্য
+                session_regenerate_id(true);
                 $_SESSION['admin_id'] = $id;
                 $_SESSION['admin_name'] = $name;
                 $_SESSION['admin_role'] = $role;
@@ -56,19 +54,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-image: url('images/admin-bg.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .login-container {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 400px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        .login-container h2 {
+            font-weight: 600;
+        }
+        button.btn-primary {
+            background-color: #0d6efd;
+            border: none;
+        }
+        button.btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .alert {
+            font-size: 0.95rem;
         }
     </style>
 </head>
@@ -86,12 +106,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
+
         <?php if (!empty($error_message)): ?>
             <div class="alert alert-danger mt-3" role="alert">
                 <?= $error_message ?>
             </div>
         <?php endif; ?>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

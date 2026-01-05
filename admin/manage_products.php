@@ -1,22 +1,18 @@
 <?php
 session_start();
 
-// অ্যাডমিন অ্যাক্সেস চেক
-if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin')
- {
+if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
     header("Location: ../admin_login.php");
     exit();
 }
 
-include '../includes/db.php'; // ডাটাবেজ কানেকশন
+include '../includes/db.php';
 
-$message = ''; // সফল বা ব্যর্থ মেসেজ দেখানোর জন্য
+$message = '';
 
-// --- Product Deletion Logic ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_product'])) {
     $product_id = $_POST['product_id_to_delete'];
 
-    // আগে পণ্যের ছবির নাম খুঁজে বের করুন, যাতে ফাইল সিস্টেম থেকেও ছবিটি ডিলিট করা যায়
     $stmt_select_image = $conn->prepare("SELECT image FROM products WHERE id = ?");
     $stmt_select_image->bind_param("i", $product_id);
     $stmt_select_image->execute();
@@ -24,32 +20,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_product'])) {
     $stmt_select_image->fetch();
     $stmt_select_image->close();
 
-    // ডাটাবেজ থেকে পণ্য ডিলিট করুন
     $stmt_delete_product = $conn->prepare("DELETE FROM products WHERE id = ?");
     $stmt_delete_product->bind_param("i", $product_id);
 
     if ($stmt_delete_product->execute()) {
-        // যদি ডাটাবেজ থেকে সফলভাবে ডিলিট হয়, ফাইল সিস্টেম থেকেও ছবিটি ডিলিট করুন
         if (!empty($image_to_delete) && file_exists("../images/" . $image_to_delete)) {
-            unlink("../images/" . $image_to_delete); // ছবিটি ডিলিট করুন
+            unlink("../images/" . $image_to_delete);
         }
         $message = "<div class='alert alert-success'>Product deleted successfully!</div>";
     } else {
         $message = "<div class='alert alert-danger'>Error deleting product: " . $conn->error . "</div>";
     }
     $stmt_delete_product->close();
-    // ডিলিট করার পর পেজ রিলোড করার জন্য একই পেজে রিডাইরেক্ট করুন
-    // এটি ফর্ম রি-সাবমিশন প্রতিরোধ করবে এবং আপডেট করা তালিকা দেখাবে
     header("Location: manage_products.php?message=" . urlencode(strip_tags($message)));
     exit();
 }
 
-// URL থেকে মেসেজ চেক করুন (ডিলিট সফল হলে বা ব্যর্থ হলে মেসেজ দেখানোর জন্য)
 if (isset($_GET['message'])) {
     $message = urldecode($_GET['message']);
 }
 
-// ডাটাবেজ থেকে পণ্য ফেচ করুন (এই অংশটি আপনার কোডে ইতিমধ্যেই আছে)
 $products = [];
 $sql = "SELECT id, name, price, image, stock, description FROM products ORDER BY id DESC";
 $result = $conn->query($sql);
@@ -60,7 +50,6 @@ if ($result->num_rows > 0) {
     }
 }
 $conn->close();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,33 +92,43 @@ $conn->close();
             <nav class="col-md-2 d-none d-md-block sidebar">
                 <div class="position-sticky">
                     <h4 class="text-center mb-4">Admin Panel</h4>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.php">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="manage_products.php">
-                                <i class="fas fa-box"></i> Manage Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="manage_users.php">
-                                <i class="fas fa-users"></i> Manage Users
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="manage_orders.php">
-                                <i class="fas fa-clipboard-list"></i> Manage Orders
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../logout.php">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link active" href="index.php">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_products.php">
+            <i class="fas fa-box"></i> Manage Products
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_users.php">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_orders.php">
+            <i class="fas fa-clipboard-list"></i> Manage Orders
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_contacts.php">
+            <i class="fas fa-envelope"></i> Contact Messages
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="../logout.php">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
                 </div>
             </nav>
 
@@ -172,7 +171,7 @@ $conn->close();
                                         <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($product['name']) ?></td>
-                                    <td>$<?= number_format($product['price'], 2) ?></td>
+                                    <td><?= number_format($product['price'], 2) ?> TK</td>
                                     <td><?= htmlspecialchars($product['stock']) ?></td>
                                     <td>
                                         <a href="edit_product.php?id=<?= htmlspecialchars($product['id']) ?>" class="btn btn-info btn-sm">

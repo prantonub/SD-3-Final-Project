@@ -1,39 +1,36 @@
 <?php
 session_start();
+include 'includes/db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $product_id = $_POST['product_id'];
-    $product_name = $_POST['product_name'];
-    $product_price = $_POST['product_price'];
-    $product_image = $_POST['product_image'];
+    $product_id = intval($_POST['product_id']);
 
-    $cart_item = [
-        'id' => $product_id,
-        'name' => $product_name,
-        'price' => $product_price,
-        'image' => $product_image,
-        'quantity' => 1
-    ];
+    // Check if product already exists in user's cart
+    $stmt = $conn->prepare("SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?");
+    $stmt->bind_param("ii", $user_id, $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    // যদি cart না থাকে তাহলে নতুন cart বানাও
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+    if ($result->num_rows > 0) {
+        // Already exists → increase quantity
+        $update_stmt = $conn->prepare("UPDATE cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?");
+        $update_stmt->bind_param("ii", $user_id, $product_id);
+        $update_stmt->execute();
+    } else {
+        // New item → insert
+        $insert_stmt = $conn->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, 1)");
+        $insert_stmt->bind_param("ii", $user_id, $product_id);
+        $insert_stmt->execute();
     }
 
-    $found = false;
-    // চেক করবো আগে থেকেই আছে কিনা
-    foreach ($_SESSION['cart'] as &$item) {
-        if ($item['id'] == $product_id) {
-            $item['quantity'] += 1;
-            $found = true;
-            break;
-        }
-    }
-
-    if (!$found) {
-        $_SESSION['cart'][] = $cart_item;
-    }
-
+    // Redirect to cart page
     header("Location: cart.php");
     exit();
 }

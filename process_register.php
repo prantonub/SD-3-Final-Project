@@ -1,58 +1,87 @@
 <?php
-// মনে রাখবেন: এই ফাইলের একদম শুরুতে এই PHP ট্যাগ ছাড়া অন্য কোনো স্পেস বা টেক্সট থাকবে না।
 session_start();
-include 'includes/db.php'; // Connect to the database
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. Collect and trim user inputs
-    $name = trim($_POST['name']);
-    $phone = trim($_POST['phone']);
-    $email = trim($_POST['email']);
-    $password_raw = $_POST['password'];
+// Database connection
+include __DIR__ . '/includes/db.php';
 
-    // 2. Basic validation
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "❌ Invalid email format.";
-        exit;
-    }
+// PHPMailer includes
+require __DIR__ . '/PHPMailer/src/PHPMailer.php';
+require __DIR__ . '/PHPMailer/src/SMTP.php';
+require __DIR__ . '/PHPMailer/src/Exception.php';
 
-    if (strlen($password_raw) < 6) {
-        echo "❌ Password must be at least 6 characters.";
-        exit;
-    }
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-    // 3. Check if email already exists
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        echo "❌ Email already registered.";
-        $stmt->close();
-        exit;
-    }
-    $stmt->close();
-
-    // 4. Hash the password securely
-    $password = password_hash($password_raw, PASSWORD_DEFAULT);
-
-    // 5. Insert user into the database with default role 'user'
-    $role = 'user'; // নতুন ব্যবহারকারীর রোল 'user' হিসেবে সেট করা হচ্ছে
-
-    $stmt = $conn->prepare("INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $name, $phone, $email, $password, $role); // 'role' যোগ করা হয়েছে
-
-    if ($stmt->execute()) {
-        // ✅ এই অংশটি পরিবর্তন করা হয়েছে:
-        // রেজিস্ট্রেশন সফল হলে সরাসরি লগইন পেজে রিডাইরেক্ট করা হচ্ছে।
-        header("Location: login.html");
-        exit(); // রিডাইরেক্ট করার পর স্ক্রিপ্ট বন্ধ করা জরুরি
-    } else {
-        // যদি ডাটাবেজে কোনো ত্রুটি হয়
-        echo "❌ Error: " . $stmt->error;
-    }
-
-    $stmt->close();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: register.php");
+    exit();
 }
-?>
+
+$name = trim($_POST['name']);
+$username = trim($_POST['username']);
+$phone = trim($_POST['phone']);
+$email = trim($_POST['email']);
+$password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+
+if (empty($name) || empty($username) || empty($phone) || empty($email) || empty($password)) {
+    $_SESSION['error'] = "All fields are required!";
+    header("Location: register.php");
+    exit();
+}
+
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
+$stmt->bind_param("ss", $email, $username);
+$stmt->execute();
+$stmt->store_result();
+if ($stmt->num_rows > 0) {
+    $_SESSION['error'] = "Email or Username already registered!";
+    header("Location: register.php");
+    exit();
+}
+$stmt->close();
+
+$otp = rand(100000, 999999);
+$otp_expires = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+
+$stmt = $conn->prepare("INSERT INTO users (name, username, phone, email, password, email_otp, otp_expires, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
+$stmt->bind_param("sssssss", $name, $username, $phone, $email, $password, $otp, $otp_expires);
+
+if ($stmt->execute()) {
+    $user_id = $stmt->insert_id;
+    $stmt->close();
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'your_email@gmail.com';
+        $mail->Password   = 'your_app_password';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
+
+        $mail->setFrom('your_email@gmail.com', 'Electronic Shop BD');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Verify Your Email - Electronic Shop BD';
+        $mail->Body    = "Hi $name,<br><br>Your OTP code: <b>$otp</b><br>Expires in 10 minutes.";
+
+        $mail->send();
+
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['success'] = "OTP sent to your email. Please verify.";
+        header("Location: verify_email.php");
+        exit();
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Failed to send OTP. Mailer Error: {$mail->ErrorInfo}";
+        header("Location: register.php");
+        exit();
+    }
+} else {
+    $_SESSION['error'] = "Registration failed. Please try again.";
+    header("Location: register.php");
+    exit();
+}
+
+$conn->close();

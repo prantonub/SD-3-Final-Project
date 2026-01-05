@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// ✅ অ্যাডমিন চেক
 if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
     header("Location: ../admin_login.php");
     exit();
@@ -11,7 +10,6 @@ include '../includes/db.php';
 
 $message = '';
 
-// ✅ Order status update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_order_status'])) {
     $order_id = $_POST['order_id'];
     $new_status = $_POST['new_status'];
@@ -30,17 +28,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_order_status'])
         $message = "<div class='alert alert-danger'>Invalid order status selected.</div>";
     }
 
-    // ✅ রিডাইরেক্ট with message
     header("Location: manage_orders.php?message=" . urlencode(strip_tags($message)));
     exit();
 }
 
-// ✅ মেসেজ read from URL
 if (isset($_GET['message'])) {
     $message = urldecode($_GET['message']);
 }
 
-// ✅ অর্ডার ফেচ
 $orders = [];
 $sql = "SELECT o.id, u.name AS customer_name, o.total, o.status, o.order_date 
         FROM orders o 
@@ -89,13 +84,43 @@ $conn->close();
         <nav class="col-md-2 d-none d-md-block sidebar">
             <div class="position-sticky">
                 <h4 class="text-center mb-4">Admin Panel</h4>
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_products.php"><i class="fas fa-box"></i> Manage Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_users.php"><i class="fas fa-users"></i> Manage Users</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="manage_orders.php"><i class="fas fa-clipboard-list"></i> Manage Orders</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link active" href="index.php">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_products.php">
+            <i class="fas fa-box"></i> Manage Products
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_users.php">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_orders.php">
+            <i class="fas fa-clipboard-list"></i> Manage Orders
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_contacts.php">
+            <i class="fas fa-envelope"></i> Contact Messages
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="../logout.php">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
             </div>
         </nav>
 
@@ -125,7 +150,7 @@ $conn->close();
                             <tr>
                                 <td><?= htmlspecialchars($order['id']) ?></td>
                                 <td><?= htmlspecialchars($order['customer_name']) ?></td>
-                                <td>$<?= number_format($order['total'], 2) ?></td>
+                                <td><?= number_format($order['total'], 2) ?> TK</td>
                                 <td>
                                     <form action="manage_orders.php" method="POST" style="display:inline-block;">
                                         <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['id']) ?>">

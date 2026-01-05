@@ -61,13 +61,44 @@ $conn->close();
         <nav class="col-md-2 d-none d-md-block sidebar">
             <div class="position-sticky">
                 <h4 class="text-center mb-4">Admin Panel</h4>
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link active" href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_products.php"><i class="fas fa-box"></i> Manage Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_users.php"><i class="fas fa-users"></i> Manage Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_orders.php"><i class="fas fa-clipboard-list"></i> Manage Orders</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link active" href="index.php">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_products.php">
+            <i class="fas fa-box"></i> Manage Products
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_users.php">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_orders.php">
+            <i class="fas fa-clipboard-list"></i> Manage Orders
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="manage_contacts.php">
+            <i class="fas fa-envelope"></i> Contact Messages
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="../logout.php">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
+
             </div>
         </nav>
 
