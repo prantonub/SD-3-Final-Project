@@ -1,18 +1,18 @@
 <?php
 session_start();
 
-// ✅ ঠিক করা হয়েছে: admin session variable চেক
+
 if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
     header("Location: ../admin_login.php");
     exit();
 }
 
-include '../includes/db.php'; // ডাটাবেজ কানেকশন
+include '../includes/db.php'; // connect db
 
 $message = '';
 $product_data = null;
 
-// --- পণ্যের ডেটা ফেচ করুন ---
+//
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $product_id = $_GET['id'];
 
@@ -31,7 +31,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $message = "<div class='alert alert-warning'>No product ID provided for editing.</div>";
 }
 
-// --- ফর্ম সাবমিশন ---
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
     $product_id = $_POST['product_id'];
     $name = $_POST['name'];
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
     $existing_image = $_POST['existing_image'];
     $image_name = $existing_image;
 
-    // --- Image Upload ---
+    
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $target_dir = "../images/";
         $uploaded_image_name = basename($_FILES["image"]["name"]);
