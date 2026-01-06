@@ -4,7 +4,7 @@ $user = "root";           // XAMPP default
 $password = "";           // No password in XAMPP
 $database = "electronics_shop";
 
-// Connect to database
+// Connect to database server
 $conn = new mysqli($host, $user, $password, $database);
 
 // Check connection
