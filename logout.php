@@ -1,7 +1,7 @@
 <?php
 session_start(); // Start the session
 
-// Check if user or admin is logged in
+// Check if user || admin is logged in
 if (isset($_SESSION['user_id'])) {
     // Unset user-specific session variables
     unset($_SESSION['user_id']);
