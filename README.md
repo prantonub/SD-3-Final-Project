@@ -18,7 +18,7 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
 
 - 🛍️ **Shopping Cart**
   - Add products to cart
-  - View cart items
+  - View and update cart items
   - Session-based cart handling
 
 - 📦 **Product Management**
@@ -35,6 +35,16 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
   - About Us
   - Contact Page
   - My Orders (for logged-in users)
+
+- ⚙️ **Admin Panel Features**
+  - Manage products (add, edit, delete)
+  - View user orders
+  - Manage user accounts
+  - Dashboard overview of sales and products
+
+- 💰 **Payment Options**
+  - Cash on Delivery (COD)
+  - bKash payment
 
 - 📱 **Fully Responsive**
   - Works on mobile, tablet, and desktop
