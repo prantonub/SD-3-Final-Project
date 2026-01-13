@@ -4,6 +4,12 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
 
 ---
 
+## 👥 Team Members
+
+- **Md Tauhidul Islam Pranto (1217)** – Frontend Developer  
+- **Jane Smith** – Backend Developer  
+- **Alex Brown** – Database & Testing  
+
 ## 🚀 Features
 
 - 🏠 **Modern Homepage**
@@ -13,6 +19,7 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
 
 - 👤 **User Authentication**
   - User registration & login
+  - Verify email with OTP
   - Session-based authentication
   - Personalized welcome message
 
@@ -74,9 +81,5 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
 - **Install XAMPP / WAMP / Laragon** and start **Apache** & **MySQL**.
 - **Copy project folder** to `C:\xampp\htdocs\electronic-shop-bd` (or your server root).
 - **Create a database** named `electronic_shop_bd` in **phpMyAdmin** and import the `.sql` file.
-- **Edit `includes/db.php`** with your database credentials:
-  ```php
-  $host = "localhost";
-  $user = "root";
-  $pass = "";
-  $db   = "electronic_shop_bd";
+- **Edit `includes/db.php`** with your database credentials: "electronic_shop_bd"
+- **Open in browser** http://localhost/electronic-shop-bd/
