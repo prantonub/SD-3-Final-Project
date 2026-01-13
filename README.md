@@ -69,3 +69,14 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
   - CDN-based assets
 
 ---
+## ⚡ How to Run This Project
+
+- **Install XAMPP / WAMP / Laragon** and start **Apache** & **MySQL**.
+- **Copy project folder** to `C:\xampp\htdocs\electronic-shop-bd` (or your server root).
+- **Create a database** named `electronic_shop_bd` in **phpMyAdmin** and import the `.sql` file.
+- **Edit `includes/db.php`** with your database credentials:
+  ```php
+  $host = "localhost";
+  $user = "root";
+  $pass = "";
+  $db   = "electronic_shop_bd";
