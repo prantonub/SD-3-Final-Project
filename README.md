@@ -4,12 +4,6 @@ Electronic Shop BD is a PHP-based e-commerce web application designed for sellin
 
 ---
 
-## 👥 Team Members
-
-- **Md Tauhidul Islam Pranto (1217)** – Frontend Developer  (Team Leader)
-- **Md Hasan Sikder (1039)** – Backend Developer
-- **Minhaz Ahmed Munna (1227)** – Database & Testing  
-
 ## 🚀 Features
 
 - 🏠 **Modern Homepage**
